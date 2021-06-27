@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link preload="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" as="style">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Data URI</title>
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="">
+    <meta name="keywords" content="image to base64, image to data uri">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+    <main class="container mt-3">
+        <h1 class="mb-4">Convert image to base64</h1>
+        <form id="upload" class="p-3 border rounded" autocomplete="off">
+            <div class="input-group mb-3">
+                <label class="input-group-text" for="upload-file">Upload</label>
+                <input type="file" class="form-control" id="upload-file" accept="image/jpeg,image/png">
+            </div>
+            <button type="reset" class="btn btn-primary" id="reset" disabled title="Clear form data">Clear</button>
+        </form>
+        <form class="mt-3 p-3 border rounded" autocomplete="off" novalidate>
+            <label for="result">Output</label>
+            <textarea class="mt-3 form-control" id="result" style="font-size:0.75rem;min-height:300px;" readonly
+                aria-describedby="output-belp-block"></textarea>
+            <div id="output-belp-block" class="form-text">Click on the field to copy!</div>
+        </form>
+    </main>
+</body>
+<script>
+    (function () {
+        if ('undefined' === typeof window.FileReader) {
+            console.error('FileReader error!');
+            return;
+        }
+
+        const inputFile = document.getElementById('upload-file');
+        const resetButton = document.getElementById('reset');
+        const resultField = document.getElementById('result');
+
+        inputFile.addEventListener('change', function (e) {
+            const { target } = e;
+
+            if ('undefined' === typeof target.files[0]) {
+                resultField.value = '';
+                resetButton.disabled = true;
+                return true;
+            }
+
+            const { size, type } = target.files[0];
+            const maxFileSize = 1024 * 1024 * 5;//5Mb
+            const allowedMimeTypes = ['image/jpeg', 'image/png'];
+
+            if (!allowedMimeTypes.includes(type) || maxFileSize < size) {
+                console.error('Wrong file!');
+                return false;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function ({ target: { result } }) {
+                resetButton.disabled = false;
+                resultField.value = result;
+            };
+            reader.readAsDataURL(target.files[0]);
+        });
+
+        resetButton.addEventListener('click', function () {
+            resultField.value = '';
+        })
+
+        resultField.addEventListener('click', function () {
+            this.select();
+            document.execCommand('copy');
+        })
+    })();
+</script>
+
+</html>
